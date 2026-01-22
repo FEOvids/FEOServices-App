@@ -51,16 +51,17 @@
         };
 
         // AUTH ACTION
-        window.authAction = async (type) => {
+   window.authAction = async (type) => {
+            console.log("Auth started for:", type);
             try {
+                // If your API key is cooked, this will fail, so we catch it
                 if (initialToken) {
                     await signInWithCustomToken(auth, initialToken);
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                console.error("Auth error:", error);
-                // Fallback UI login if firebase fails or is restricted
+                console.error("Firebase is hating, going offline mode:", error);
                 handleAuthSuccess({ uid: "offline_op", displayName: "Operator" });
             }
         };
