@@ -238,19 +238,18 @@
         <p class="text-gray-400 mb-8 text-center">Secure environment. Authentication required to access core modules.</p>
         
         <div class="w-full max-w-xs space-y-3">
-            <button onclick="authAction('google')" class="w-full bg-white text-black py-4 rounded-full font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform">
-                <i data-lucide="mail"></i> Join System
-            </button>
-            <button onclick="authAction('github')" class="w-full bg-[#24292e] text-white py-4 rounded-full font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform">
-                <i data-lucide="github"></i> GitHub Auth
-            </button>
-            <div class="flex gap-2">
-                <button onclick="authAction('phone')" class="flex-1 bg-gray-700 text-white py-4 rounded-full font-bold text-xs">Phone</button>
-                <button onclick="authAction('email')" class="flex-1 bg-gray-700 text-white py-4 rounded-full font-bold text-xs">Email</button>
-            </div>
-            <p class="text-[10px] text-center text-gray-500 mt-4">By signing in, u agree to FSHB terms of service.</p>
-        </div>
+    <button onclick="window.authAction('google')" class="w-full bg-white text-black py-4 rounded-full font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform">
+        <i data-lucide="mail"></i> Join System
+    </button>
+    <button onclick="window.authAction('github')" class="w-full bg-[#24292e] text-white py-4 rounded-full font-bold flex items-center justify-center gap-3 active:scale-95 transition-transform">
+        <i data-lucide="github"></i> GitHub Auth
+    </button>
+    <div class="flex gap-2">
+        <button onclick="window.authAction('phone')" class="flex-1 bg-gray-700 text-white py-4 rounded-full font-bold text-xs">Phone</button>
+        <button onclick="window.authAction('email')" class="flex-1 bg-gray-700 text-white py-4 rounded-full font-bold text-xs">Email</button>
     </div>
+    <p class="text-[10px] text-center text-gray-500 mt-4">By signing in, u agree to FSHB terms of service.</p>
+</div>
 
     <!-- TOP BAR -->
     <header class="fixed top-0 w-full h-16 flex items-center justify-between px-6 z-50 bg-[var(--m3-surface)] border-b border-white/5">
