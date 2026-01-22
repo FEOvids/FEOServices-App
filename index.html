@@ -106,24 +106,26 @@ function handleAuthSuccess(user) {
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
+    --m3-surface: #f7f9ff;
+    --m3-surface-container: #eeeeee;
+    --m3-primary: #005fb0;
+    --m3-on-primary: #ffffff;
+    --m3-secondary-container: #d8e2ff;
+    --m3-on-secondary-container: #001a41;
+    --m3-outline: #74777f;
+    --m3-text: #000000;
+    --blur-val: 12px;
+    --anim-speed: 0.3s;
+    --anim-curve: cubic-bezier(0.2, 0, 0, 1);
+}
+
 main {
-            background-color: var(--m3-surface);
-            min-height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
-            --m3-surface: #f7f9ff;
-            --m3-surface-container: #eeeeee;
-            --m3-primary: #005fb0;
-            --m3-on-primary: #ffffff;
-            --m3-secondary-container: #d8e2ff;
-            --m3-on-secondary-container: #001a41;
-            --m3-outline: #74777f;
-            --m3-text: #000000; /* Added black text for light mode */
-            --blur-val: 12px;
-            --anim-speed: 0.3s;
-            --anim-curve: cubic-bezier(0.2, 0, 0, 1);
-        }
+    background-color: var(--m3-surface);
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
 
         .dark {
             --m3-surface: #1a1c1e;
