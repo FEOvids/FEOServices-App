@@ -78,33 +78,48 @@
         });
 
 function handleAuthSuccess(user) {
-            // Yesh, show the content FIRST
-            const homeView = document.getElementById('home-view');
-            if (homeView) homeView.classList.add('active');
-            
-            // Unhide the main container just in case
-            document.querySelector('main').style.opacity = '1';
-            document.querySelector('main').style.display = 'block';
+    console.log("SUCCESS: Switching to home view...");
+    
+    // 1. Force the home view to show
+    const homeView = document.getElementById('home-view');
+    if (homeView) {
+        homeView.style.display = 'block'; 
+        homeView.classList.add('active');
+    }
 
-            const overlay = document.getElementById('auth-overlay');
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 500);
-            }
+    // 2. Kill the overlay
+    const overlay = document.getElementById('auth-overlay');
+    if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none'; // Make it unclickable immediately
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 500);
+    }
 
-            window.currentUser = user;
-            // Update UI elements
-            document.getElementById('view-title').innerText = "FEOServices";
-            const userInit = document.getElementById('user-initial');
-            if (userInit) userInit.innerText = (user.displayName || "O").charAt(0).toUpperCase();
-            
-            if (window.lucide) lucide.createIcons();
-        }
+    // 3. Update the UI
+    window.currentUser = user;
+    const title = document.getElementById('view-title');
+    if (title) title.innerText = "FEOServices";
+    
+    const userInit = document.getElementById('user-initial');
+    if (userInit) userInit.innerText = (user.displayName || "O").charAt(0).toUpperCase();
+    
+    if (window.lucide) lucide.createIcons();
+}
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+ .view-content {
+    display: none; /* Hidden by default */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.view-content.active {
+    display: block !important; /* Show it when active */
+    opacity: 1;
+}
         :root {
     --m3-surface: #f7f9ff;
     --m3-surface-container: #eeeeee;
