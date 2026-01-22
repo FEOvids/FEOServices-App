@@ -76,13 +76,22 @@
             }
         });
 
-        function handleAuthSuccess(user) {
-            document.getElementById('auth-overlay').style.opacity = '0';
+     function handleAuthSuccess(user) {
+            // First, make sure the home view is actually visible under the overlay
+            document.getElementById('home-view').classList.add('active');
+            
+            const overlay = document.getElementById('auth-overlay');
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none'; // Stop it from blocking clicks during fade
+            
             setTimeout(() => {
-                document.getElementById('auth-overlay').style.display = 'none';
+                overlay.style.display = 'none';
                 document.querySelectorAll('.auth-gate').forEach(el => el.classList.remove('locked-feature'));
-                document.getElementById('user-initial').innerText = (user.displayName || "O").charAt(0).toUpperCase();
+                if(document.getElementById('user-initial')) {
+                    document.getElementById('user-initial').innerText = (user.displayName || "O").charAt(0).toUpperCase();
+                }
                 window.currentUser = user;
+                lucide.createIcons(); // Refresh icons after unlocking
             }, 500);
         }
     </script>
@@ -201,15 +210,19 @@
 
         #auth-overlay {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh; /* Dynamic height for mobile */
             background: var(--m3-surface);
             z-index: 5000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 1.5rem;
             transition: opacity 0.5s ease;
+            box-sizing: border-box;
         }
 
         canvas#art-canvas {
