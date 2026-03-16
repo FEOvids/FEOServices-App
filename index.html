@@ -632,6 +632,18 @@
                 <div id="qrcode"></div>
             </div>
             
+            <div class="setting-group">
+                <div class="setting-title">Share App</div>
+                <div class="setting-row">
+                    <span>PWA Download Link</span>
+                    <button class="btn btn-primary" onclick="copyPwaLink()"><i data-lucide="copy" style="display:inline-block; vertical-align:middle; width:18px; margin-right:8px;"></i> Copy Link</button>
+                </div>
+                <div class="setting-row" id="installAppRow" style="display: none;">
+                    <span>Install App (Native)</span>
+                    <button class="btn btn-primary" onclick="installPWA()"><i data-lucide="download" style="display:inline-block; vertical-align:middle; width:18px; margin-right:8px;"></i> Install</button>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -1155,6 +1167,47 @@
             new QRCode(qrContainer, { text: txt, width: 128, height: 128, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
         }
 
+        window.copyPwaLink = () => {
+            const url = window.location.href;
+            const textArea = document.createElement("textarea");
+            textArea.value = url;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("PWA Install Link copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy.");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // --- PWA INSTALL LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI to notify the user they can install the PWA
+            const installRow = document.getElementById('installAppRow');
+            if(installRow) installRow.style.display = 'flex';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast("App installed successfully! 🚀");
+                document.getElementById('installAppRow').style.display = 'none';
+            }
+            // We've used the prompt, and can't use it again, throw it away
+            deferredPrompt = null;
+        }
+
         // --- TASKIOR LOGIC ---
         let tasks = JSON.parse(localStorage.getItem('feo_tasks') || '[]');
         
@@ -1362,28 +1415,15 @@
             if(document.getElementById('paintorModal').classList.contains('open')) paintorResize();
         });
 
-        // --- Service Worker Registration ---
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("service-worker.js")
-            .then(() => console.log("Service Worker Registered"))
-            .catch(err => console.error("Service Worker Registration Failed!", err));
-        }
+    </script>
 
-        // --- PWA Install Prompt ---
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); // stop Chrome auto prompt
-            deferredPrompt = e;
-            document.getElementById('installBtn').style.display = 'block';
-        });
-
-        document.getElementById('installBtn').addEventListener('click', async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt(); // show install prompt
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response: ${outcome}`);
-            deferredPrompt = null;
-        });
+    <!-- Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.error("Service Worker Registration Failed!", err));
+      }
     </script>
 </body>
+</html>
