@@ -44,7 +44,7 @@
         }
 
         /* Themes (Fixed Root Applicators) */
-        html[data-theme="dark"], body[data-theme="dark"] {
+        :root[data-theme="dark"] {
             --md-sys-color-primary: #9ecaeb;
             --md-sys-color-on-primary: #003258;
             --md-sys-color-primary-container: #00497d;
@@ -57,7 +57,7 @@
             --bg-gradient: none;
         }
 
-        html[data-theme="feoblue"], body[data-theme="feoblue"] {
+        :root[data-theme="feoblue"] {
             --md-sys-color-primary: #ffffff;
             --md-sys-color-on-primary: #00497d;
             --md-sys-color-primary-container: rgba(255,255,255,0.2);
@@ -70,7 +70,7 @@
             --bg-gradient: linear-gradient(135deg, #00497d 0%, #0099ff 50%, #ffcc00 100%);
         }
 
-        html[data-theme="feored"], body[data-theme="feored"] {
+        :root[data-theme="feored"] {
             --md-sys-color-primary: #ffffff;
             --md-sys-color-on-primary: #7d0000;
             --md-sys-color-primary-container: rgba(255,255,255,0.2);
@@ -1127,7 +1127,6 @@
         // --- SETTINGS LOGIC ---
         window.changeTheme = (val, notify = true) => {
             document.documentElement.setAttribute('data-theme', val);
-            document.body.setAttribute('data-theme', val);
             localStorage.setItem('feo_theme', val);
             if(notify) showToast(`Theme changed`);
         }
@@ -1168,7 +1167,7 @@
         }
 
         window.copyPwaLink = () => {
-            const url = window.location.href;
+            const url = window.location.origin + window.location.pathname + "?install=true";
             const textArea = document.createElement("textarea");
             textArea.value = url;
             document.body.appendChild(textArea);
@@ -1189,9 +1188,21 @@
             e.preventDefault();
             // Stash the event so it can be triggered later.
             deferredPrompt = e;
+            
             // Update UI to notify the user they can install the PWA
             const installRow = document.getElementById('installAppRow');
             if(installRow) installRow.style.display = 'flex';
+            
+            // Browsers BLOCK auto-installing on page load. 
+            // If they came from the external link, route them to the button instead!
+            if (window.location.search.includes('install=true')) {
+                switchTab('settings');
+                showToast("Click 'Install' below to add to Home Screen! 🚀");
+                if(installRow) {
+                    installRow.style.boxShadow = "0 0 20px var(--md-sys-color-primary)";
+                    installRow.style.border = "2px solid var(--md-sys-color-primary)";
+                }
+            }
         });
 
         window.installPWA = async () => {
