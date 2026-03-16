@@ -1362,15 +1362,28 @@
             if(document.getElementById('paintorModal').classList.contains('open')) paintorResize();
         });
 
-    </script>
+        // --- Service Worker Registration ---
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js")
+            .then(() => console.log("Service Worker Registered"))
+            .catch(err => console.error("Service Worker Registration Failed!", err));
+        }
 
-    <!-- Service Worker Registration -->
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("Service Worker Registered"))
-        .catch(err => console.error("Service Worker Registration Failed!", err));
-      }
+        // --- PWA Install Prompt ---
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // stop Chrome auto prompt
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'block';
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt(); // show install prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response: ${outcome}`);
+            deferredPrompt = null;
+        });
     </script>
 </body>
-</html>
