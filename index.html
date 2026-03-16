@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FEOServices Workspace</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- Icons & Utilities -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* =========================================
+           MATERIAL 3 THEME & UZI ENGINE VARIABLES
+           ========================================= */
+        :root {
+            /* Default Material 3 Light (Uzi 3.4) */
+            --md-sys-color-primary: #0061a4;
+            --md-sys-color-on-primary: #ffffff;
+            --md-sys-color-primary-container: #d1e4ff;
+            --md-sys-color-on-primary-container: #001d36;
+            --md-sys-color-background: #fdfcff;
+            --md-sys-color-on-background: #1a1c1e;
+            --md-sys-color-surface: #fdfcff;
+            --md-sys-color-surface-variant: #dfe2eb;
+            --md-sys-color-on-surface-variant: #43474e;
+            --md-sys-color-error: #ba1a1a;
+            
+            --border-radius-sm: 12px;
+            --border-radius-md: 20px;
+            --border-radius-lg: 28px;
+            --border-radius-pill: 9999px;
+            
+            --transition-standard: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            --font-family: system-ui, -apple-system, sans-serif;
+            --bg-gradient: none;
+            --glass-backdrop: none;
+            --glass-bg: var(--md-sys-color-surface);
+        }
+
+        /* Themes (Fixed Root Applicators) */
+        html[data-theme="dark"], body[data-theme="dark"] {
+            --md-sys-color-primary: #9ecaeb;
+            --md-sys-color-on-primary: #003258;
+            --md-sys-color-primary-container: #00497d;
+            --md-sys-color-on-primary-container: #d1e4ff;
+            --md-sys-color-background: #000000; /* True AMOLED black background */
+            --md-sys-color-on-background: #e2e2e6;
+            --md-sys-color-surface: #121212; 
+            --md-sys-color-surface-variant: #1e1e1e;
+            --md-sys-color-on-surface-variant: #c3c7cf;
+            --bg-gradient: none;
+        }
+
+        html[data-theme="feoblue"], body[data-theme="feoblue"] {
+            --md-sys-color-primary: #ffffff;
+            --md-sys-color-on-primary: #00497d;
+            --md-sys-color-primary-container: rgba(255,255,255,0.2);
+            --md-sys-color-on-primary-container: #ffffff;
+            --md-sys-color-background: #00497d;
+            --md-sys-color-on-background: #ffffff;
+            --md-sys-color-surface: rgba(255,255,255,0.1);
+            --md-sys-color-surface-variant: rgba(255,255,255,0.15);
+            --md-sys-color-on-surface-variant: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #00497d 0%, #0099ff 50%, #ffcc00 100%);
+        }
+
+        html[data-theme="feored"], body[data-theme="feored"] {
+            --md-sys-color-primary: #ffffff;
+            --md-sys-color-on-primary: #7d0000;
+            --md-sys-color-primary-container: rgba(255,255,255,0.2);
+            --md-sys-color-on-primary-container: #ffffff;
+            --md-sys-color-background: #7d0000;
+            --md-sys-color-on-background: #ffffff;
+            --md-sys-color-surface: rgba(255,255,255,0.1);
+            --md-sys-color-surface-variant: rgba(255,255,255,0.15);
+            --md-sys-color-on-surface-variant: #ffffff;
+            --bg-gradient: linear-gradient(135deg, #ff0000 0%, #ff6600 100%);
+        }
+
+        /* =========================================
+           UZI ENGINE VERSIONS (HEAVY DIFFERENCES)
+           ========================================= */
+           
+        /* Uzi 1.0 - Broken, Ugly, Side Navigation */
+        html[data-uzi="1.0"], body[data-uzi="1.0"] {
+            --border-radius-sm: 0px; --border-radius-md: 0px; --border-radius-lg: 0px; --border-radius-pill: 0px;
+            --transition-standard: none !important;
+            --font-family: "Courier New", Courier, monospace;
+        }
+        body[data-uzi="1.0"] * { transition: none !important; animation: none !important; }
+        body[data-uzi="1.0"] .bottom-nav {
+            top: 0; left: 0; bottom: auto; right: auto;
+            width: 80px; height: 100vh;
+            flex-direction: column; justify-content: flex-start; padding-top: 2rem;
+            border-right: 4px solid var(--md-sys-color-on-background);
+            box-shadow: none;
+            background: var(--md-sys-color-surface-variant);
+        }
+        body[data-uzi="1.0"] .view-container {
+            padding-left: 90px; padding-bottom: 2rem;
+        }
+        body[data-uzi="1.0"] .card {
+            border: 2px solid var(--md-sys-color-on-background);
+            box-shadow: 4px 4px 0px var(--md-sys-color-on-background);
+            transform: rotate(-1deg);
+        }
+
+        /* Uzi 2.0 - Normal / Standard */
+        html[data-uzi="2.0"], body[data-uzi="2.0"] {
+            --border-radius-sm: 4px; --border-radius-md: 8px; --border-radius-lg: 12px; --border-radius-pill: 12px;
+            --transition-standard: all 0.2s ease-in-out;
+            --font-family: Arial, Helvetica, sans-serif;
+        }
+        body[data-uzi="2.0"] .card { border: 1px solid var(--md-sys-color-surface-variant); }
+
+        /* Uzi 3.0 - Beautiful & Animated */
+        html[data-uzi="3.0"], body[data-uzi="3.0"] {
+            --border-radius-sm: 16px; --border-radius-md: 20px; --border-radius-lg: 24px; --border-radius-pill: 24px;
+            --transition-standard: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body[data-uzi="3.0"] .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Uzi 3.2 - Apple Liquid Glass */
+        html[data-uzi="3.2"], body[data-uzi="3.2"] { 
+            --border-radius-sm: 20px; --border-radius-md: 28px; --border-radius-lg: 36px; --border-radius-pill: 999px;
+            --transition-standard: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --glass-backdrop: blur(25px);
+            --glass-bg: rgba(var(--md-sys-color-surface-rgb), 0.5);
+            --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
+        }
+        body[data-uzi="3.2"] .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+        body[data-uzi="3.2"] .bottom-nav {
+            bottom: 20px; left: 20px; right: 20px; width: auto; height: 70px;
+            border-radius: 35px; border: 1px solid rgba(255,255,255,0.1);
+            background: var(--glass-bg); backdrop-filter: var(--glass-backdrop);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Uzi 3.4 - Google Material You (Default) */
+        html[data-uzi="3.4"], body[data-uzi="3.4"] {
+            --border-radius-sm: 12px; --border-radius-md: 20px; --border-radius-lg: 28px; --border-radius-pill: 9999px;
+            --transition-standard: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        /* Global Resets & Custom Scrollbars */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--md-sys-color-surface-variant); border-radius: var(--border-radius-pill); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--md-sys-color-primary); }
+        
+        html {
+            background-color: var(--md-sys-color-background);
+            transition: var(--transition-standard);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--md-sys-color-background);
+            background: var(--bg-gradient, var(--md-sys-color-background));
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--md-sys-color-on-background);
+            transition: var(--transition-standard);
+            overflow: hidden; /* App-like feel */
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Typography */
+        h1 { font-size: 2rem; font-weight: 400; letter-spacing: -0.5px; }
+        h2 { font-size: 1.5rem; font-weight: 500; }
+        h3 { font-size: 1.1rem; font-weight: 500; }
+        p { font-size: 0.875rem; color: var(--md-sys-color-on-surface-variant); line-height: 1.5; }
+
+        /* App Layout */
+        .app-header {
+            padding: 2rem 1.5rem 1rem;
+            flex-shrink: 0;
+            background: var(--glass-bg, transparent);
+            backdrop-filter: var(--glass-backdrop, none);
+            z-index: 10;
+        }
+
+        .view-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 1.5rem 6rem; /* Padding bottom for nav bar */
+            position: relative;
+        }
+
+        .view {
+            display: none;
+            animation: fadeScale 0.3s forwards;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .view.active { display: flex; }
+
+        @keyframes fadeScale {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Material Cards / Elements */
+        .card {
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-standard);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:active { transform: scale(0.96); }
+        
+        .card-large {
+            min-height: 140px;
+            justify-content: flex-end;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-large::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7));
+            z-index: 1;
+        }
+
+        .card-large > * { position: relative; z-index: 2; color: white; }
+
+        /* Lists & Grids */
+        .service-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: var(--transition-standard);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .service-item:active { transform: scale(0.98); background-color: var(--md-sys-color-surface-variant); }
+        .service-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Search Input */
+        .search-bar {
+            display: flex; align-items: center; gap: 1rem;
+            background-color: var(--md-sys-color-surface-variant);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-pill);
+            margin-bottom: 1rem;
+        }
+        .search-bar input {
+            border: none; background: transparent; outline: none;
+            width: 100%; font-size: 1rem; color: var(--md-sys-color-on-background);
+        }
+
+        /* Settings UI & Custom Dropdown */
+        .setting-group { margin-bottom: 2rem; }
+        .setting-title { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--md-sys-color-primary); margin-bottom: 1rem; }
+        .setting-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; background-color: var(--md-sys-color-surface);
+            border-radius: var(--border-radius-md); margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .btn {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            border: none; padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius-pill);
+            font-size: 1rem; font-weight: 500; cursor: pointer;
+            transition: var(--transition-standard); outline: none;
+        }
+        .btn-primary { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+        .btn:active { transform: scale(0.95); }
+
+        /* Advanced Custom Dropdown Component */
+        .feo-select {
+            position: relative; width: 220px; user-select: none;
+        }
+        .feo-select-trigger {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            padding: 0.75rem 1.25rem; border-radius: var(--border-radius-pill);
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: var(--transition-standard);
+        }
+        .feo-select-options {
+            position: absolute; top: 110%; left: 0; right: 0;
+            background-color: var(--md-sys-color-surface);
+            border: 1px solid var(--md-sys-color-surface-variant);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 100; overflow: hidden;
+            opacity: 0; pointer-events: none; transform: translateY(-10px);
+            transition: var(--transition-standard);
+        }
+        .feo-select.open .feo-select-options {
+            opacity: 1; pointer-events: auto; transform: translateY(0);
+        }
+        .feo-option {
+            padding: 0.75rem 1.25rem; cursor: pointer; transition: background 0.2s;
+            color: var(--md-sys-color-on-background);
+        }
+        .feo-option:hover { background-color: var(--md-sys-color-surface-variant); }
+
+        /* Private Notes Textarea */
+        textarea {
+            width: 100%; height: 120px; padding: 1rem;
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            border: none; border-radius: var(--border-radius-md);
+            resize: none; font-family: inherit; outline: none;
+            margin-bottom: 1rem; transition: var(--transition-standard);
+        }
+        textarea:focus { border-bottom: 2px solid var(--md-sys-color-primary); }
+
+        #qrcode { background: white; padding: 10px; border-radius: 12px; display: inline-block; margin-top: 10px; }
+
+        /* Bottom Navigation (Material 3 Style) */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background-color: var(--md-sys-color-surface);
+            display: flex; justify-content: space-around; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+            z-index: 50;
+            background: var(--glass-bg, var(--md-sys-color-surface));
+            backdrop-filter: var(--glass-backdrop, none);
+            transition: var(--transition-standard);
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 64px; height: 32px;
+            border-radius: var(--border-radius-pill);
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer; transition: var(--transition-standard);
+        }
+
+        .nav-item.active {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+        .nav-item i { transition: var(--transition-standard); }
+        .nav-item.active i { transform: scale(1.1); fill: currentColor; }
+
+        /* Fullscreen Popup / Modal System */
+        .modal {
+            position: fixed; top: 100%; left: 0; width: 100%; height: 100%;
+            background-color: var(--md-sys-color-background);
+            z-index: 100; transition: top 0.4s cubic-bezier(0.2, 0, 0, 1);
+            display: flex; flex-direction: column;
+        }
+        .modal.open { top: 0; }
+        
+        .modal-header {
+            padding: 1.5rem; display: flex; align-items: center; gap: 1rem;
+            background-color: var(--md-sys-color-surface);
+            border-bottom: 1px solid var(--md-sys-color-surface-variant);
+        }
+        .modal-body { flex: 1; position: relative; background: var(--md-sys-color-background); display: flex; flex-direction: column; overflow-y: auto;}
+        .modal-body iframe { width: 100%; height: 100%; border: none; position: relative; z-index: 2; background: transparent; flex: 1; }
+        
+        .iframe-fallback {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; z-index: 1; width: 80%; max-width: 400px;
+            display: flex; flex-direction: column; align-items: center; gap: 1rem;
+        }
+
+        /* FEO News Styles */
+        .news-article {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem; margin-bottom: 1rem; cursor: pointer;
+            transition: var(--transition-standard);
+        }
+        .news-article:hover { background-color: var(--md-sys-color-surface-variant); }
+        .news-article-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--md-sys-color-on-background); }
+        .news-article-sub { font-size: 0.9rem; color: var(--md-sys-color-on-surface-variant); margin-bottom: 1rem; }
+        .news-article-body { display: none; font-size: 0.95rem; line-height: 1.6; color: var(--md-sys-color-on-background); border-top: 1px solid var(--md-sys-color-surface-variant); padding-top: 1rem; margin-top: 1rem; }
+        .news-article.expanded .news-article-body { display: block; animation: fadeScale 0.3s ease; }
+
+        /* TASKIOR Styles */
+        .task-list { list-style: none; padding: 0; margin-top: 1rem; }
+        .task-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; background: var(--md-sys-color-surface-variant);
+            border-radius: var(--border-radius-md); margin-bottom: 0.5rem;
+        }
+        .task-item.completed { opacity: 0.5; text-decoration: line-through; }
+        .task-input-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .task-input-row input { flex: 1; padding: 1rem; border-radius: var(--border-radius-pill); border: none; background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-background); outline: none; }
+
+        /* PAINTOR Styles */
+        .paintor-toolbar {
+            display: flex; gap: 0.5rem; padding: 1rem; background: var(--md-sys-color-surface);
+            border-bottom: 1px solid var(--md-sys-color-surface-variant); overflow-x: auto; flex-shrink: 0;
+        }
+        .paintor-tool {
+            width: 40px; height: 40px; border-radius: var(--border-radius-sm); border: none;
+            background: var(--md-sys-color-surface-variant); color: var(--md-sys-color-on-surface-variant);
+            display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+        }
+        .paintor-tool.active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+        .paintor-canvas-wrapper { flex: 1; background: #222; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        #paintorCanvas { background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: crosshair; }
+        .paintor-colors { display: flex; gap: 5px; margin-left: 10px; border-left: 1px solid var(--md-sys-color-surface-variant); padding-left: 10px; }
+        .paintor-color-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+        .paintor-color-btn.active { border-color: var(--md-sys-color-primary); transform: scale(1.1); }
+
+        /* Toasts */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background-color: var(--md-sys-color-on-background);
+            color: var(--md-sys-color-background);
+            padding: 12px 24px; border-radius: var(--border-radius-pill);
+            font-size: 0.9rem; z-index: 200; opacity: 0; pointer-events: none;
+            transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Auth UI */
+        .auth-card { background: var(--md-sys-color-surface); padding: 1.5rem; border-radius: var(--border-radius-md); text-align: center; }
+        .auth-buttons { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+
+    </style>
+</head>
+<body data-theme="light" data-uzi="3.4">
+
+    <!-- Header -->
+    <header class="app-header">
+        <h1 id="pageTitle" data-lang="home">Home</h1>
+    </header>
+
+    <!-- VIEWS -->
+    <div class="view-container">
+        
+        <!-- HOME VIEW -->
+        <div class="view active" id="view-home">
+            <div class="card card-large" style="background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800');" onclick="switchTab('news')">
+                <h2 data-lang="news">FEO News</h2>
+                <p>Latest updates and new things</p>
+            </div>
+            <div class="card card-large" style="background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800');" onclick="switchTab('main')">
+                <h2 data-lang="main_services">Main Services</h2>
+                <p>Access core FEO applications</p>
+            </div>
+            <div class="card card-large" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800');" onclick="openService('FEO Website', 'https://feoservices.ct.ws/', 'globe')">
+                <h2 data-lang="website">Website</h2>
+                <p>feoservices.ct.ws</p>
+            </div>
+        </div>
+
+        <!-- FEO NEWS VIEW -->
+        <div class="view" id="view-news">
+            <h2 style="margin-bottom: 1rem;">Latest Headlines</h2>
+            
+            <div class="news-article" onclick="this.classList.toggle('expanded')">
+                <div class="news-article-title">Uzi Engine 3.4 Released after 2 months of 3.0</div>
+                <div class="news-article-sub">Uzi engine 3.4, 3.3, 3.2, 3.1 are all released at the same time and are all custom according to feoservices...</div>
+                <div class="news-article-body">
+                    Uzi engine 3.4, 3.3, 3.2, 3.1 are all unique.<br><br>
+                    <strong>3.4</strong> - Material 3 UI<br>
+                    <strong>3.3</strong> - Fluent Design System<br>
+                    <strong>3.2</strong> - Liquid Glass<br>
+                    <strong>3.1</strong> - Uzi Ongine UI<br><br>
+                    Ongine according to FEOservices is their own UI design system and its very luxury and sleek and smooth. 
+                    This update brings massive architectural rewrites ensuring faster performance across all modules and applications within the FEO Workspace.
+                </div>
+            </div>
+
+            <div class="news-article" onclick="this.classList.toggle('expanded')">
+                <div class="news-article-title">Apple announces M5 Quantum Processor architecture</div>
+                <div class="news-article-sub">The new silicone breaks the laws of physics, supposedly. Read more...</div>
+                <div class="news-article-body">
+                    Apple has recently shocked the tech community by unveiling the M5 chip, utilizing early-stage quantum logic gates. This ensures computing speeds up to 40x faster than traditional ARM architectures. Release date slated for late 2027.
+                </div>
+            </div>
+
+            <div class="news-article" onclick="this.classList.toggle('expanded')">
+                <div class="news-article-title">Samsung Galaxy S27 to feature holographic display</div>
+                <div class="news-article-sub">Samsung pushes boundaries with light-bending nano-tech screens...</div>
+                <div class="news-article-body">
+                    Samsung's upcoming flagship will feature a projector-less holographic display module capable of rendering 3D objects 2 inches above the physical screen. Industry experts are skeptical but intrigued.
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN SERVICES VIEW -->
+        <div class="view" id="view-main">
+            <div class="service-list" id="mainServicesList">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- SEARCH VIEW -->
+        <div class="view" id="view-search">
+            <div class="search-bar">
+                <i data-lucide="search"></i>
+                <input type="text" id="searchInput" placeholder="Search the entire application..." oninput="handleSearch()">
+            </div>
+            <div class="service-list" id="searchResults">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- OTHER SERVICES VIEW -->
+        <div class="view" id="view-other">
+            <div class="service-list" id="otherServicesList">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div class="view" id="view-settings">
+            
+            <div class="setting-group">
+                <div class="setting-title" data-lang="auth">Account</div>
+                <div class="auth-card" id="authSection">
+                    <p>Not signed in</p>
+                    <div class="auth-buttons">
+                        <button class="btn btn-primary" onclick="signInWithGoogle()"><i data-lucide="mail" style="display:inline-block; vertical-align:middle; width:18px; margin-right:8px;"></i> Sign in with Google</button>
+                        <button class="btn" onclick="signInWithGithub()"><i data-lucide="github" style="display:inline-block; vertical-align:middle; width:18px; margin-right:8px;"></i> Sign in with GitHub</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-title" data-lang="appearance">Appearance</div>
+                
+                <div class="setting-row">
+                    <span>Theme</span>
+                    <!-- Custom Dropdown: Theme -->
+                    <div class="feo-select" id="dd-theme">
+                        <div class="feo-select-trigger" onclick="toggleDropdown('dd-theme')">
+                            <span class="selected-text">Light</span>
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                        <div class="feo-select-options">
+                            <div class="feo-option" onclick="selectDropdownOption('dd-theme', 'light', 'Light')">Light</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-theme', 'dark', 'Dark')">Dark</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-theme', 'feoblue', 'FEOBlue Gradient')">FEOBlue Gradient</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-theme', 'feored', 'FEORed Gradient')">FEORed Gradient</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <span>Uzi Engine UI Version</span>
+                    <!-- Custom Dropdown: Uzi Engine -->
+                    <div class="feo-select" id="dd-uzi">
+                        <div class="feo-select-trigger" onclick="toggleDropdown('dd-uzi')">
+                            <span class="selected-text">3.4 (Google Material You)</span>
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                        <div class="feo-select-options">
+                            <div class="feo-option" onclick="selectDropdownOption('dd-uzi', '1.0', '1.0 (Terminal / Blocky)')">1.0 (Terminal / Blocky)</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-uzi', '2.0', '2.0 (Standard Layout)')">2.0 (Standard Layout)</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-uzi', '3.0', '3.0 (Beautiful & Animated)')">3.0 (Beautiful & Animated)</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-uzi', '3.2', '3.2 (Apple Liquid Glass)')">3.2 (Apple Liquid Glass)</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-uzi', '3.4', '3.4 (Google Material You)')">3.4 (Google Material You)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <span>Language</span>
+                    <!-- Custom Dropdown: Language -->
+                    <div class="feo-select" id="dd-lang">
+                        <div class="feo-select-trigger" onclick="toggleDropdown('dd-lang')">
+                            <span class="selected-text">English</span>
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                        <div class="feo-select-options">
+                            <div class="feo-option" onclick="selectDropdownOption('dd-lang', 'en', 'English')">English</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-lang', 'ar', 'Arabic (العربية)')">Arabic (العربية)</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-lang', 'es', 'Spanish')">Spanish</div>
+                            <div class="feo-option" onclick="selectDropdownOption('dd-lang', 'jp', 'Japanese')">Japanese</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-title">Favorites</div>
+                <div class="service-list" id="favList">
+                    <p style="padding: 1rem;">No favorites yet. Star some services!</p>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-title">Personal Notes</div>
+                <textarea id="notesArea" placeholder="Write your private notes here..." oninput="saveNotes()"></textarea>
+                <button class="btn btn-primary" onclick="generateQR()">Share via QR</button>
+                <div id="qrcode"></div>
+            </div>
+            
+        </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')" data-target="home">
+            <i data-lucide="home"></i>
+        </div>
+        <div class="nav-item" onclick="switchTab('main')" data-target="main">
+            <i data-lucide="layers"></i>
+        </div>
+        <div class="nav-item" onclick="switchTab('search')" data-target="search">
+            <i data-lucide="search"></i>
+        </div>
+        <div class="nav-item" onclick="switchTab('other')" data-target="other">
+            <i data-lucide="grid"></i>
+        </div>
+        <div class="nav-item" onclick="switchTab('settings')" data-target="settings">
+            <i data-lucide="settings"></i>
+        </div>
+    </nav>
+
+    <!-- FULLSCREEN MODAL (General Web Apps) -->
+    <div class="modal" id="appModal">
+        <div class="modal-header">
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center;" onclick="closeModal('appModal')">
+                <i data-lucide="arrow-left"></i>
+            </button>
+            <h2 id="modalTitle" style="flex:1; font-size:1.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">App</h2>
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px;" id="modalFavBtn" onclick="toggleFavFromModal()">
+                <i data-lucide="star" id="modalFavIcon"></i>
+            </button>
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px;" onclick="openExternal()">
+                <i data-lucide="external-link"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- iframe or placeholder -->
+        </div>
+    </div>
+
+    <!-- FULLSCREEN MODAL (TASKIOR) -->
+    <div class="modal" id="taskiorModal">
+        <div class="modal-header">
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center;" onclick="closeModal('taskiorModal')">
+                <i data-lucide="arrow-left"></i>
+            </button>
+            <h2 style="flex:1; font-size:1.2rem;">TASKIOR</h2>
+        </div>
+        <div class="modal-body" style="padding: 2rem;">
+            <h2>Your Tasks</h2>
+            <p>Built-in FEO Task Manager</p>
+            <div class="task-input-row">
+                <input type="text" id="newTaskInput" placeholder="Add a new task...">
+                <button class="btn btn-primary" onclick="taskiorAddTask()"><i data-lucide="plus"></i></button>
+            </div>
+            <ul class="task-list" id="taskiorList"></ul>
+        </div>
+    </div>
+
+    <!-- FULLSCREEN MODAL (PAINTOR) -->
+    <div class="modal" id="paintorModal">
+        <div class="modal-header">
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center;" onclick="closeModal('paintorModal')">
+                <i data-lucide="arrow-left"></i>
+            </button>
+            <h2 style="flex:1; font-size:1.2rem;">Paintor Pro</h2>
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px;" onclick="paintorClear()">
+                <i data-lucide="trash-2"></i>
+            </button>
+            <button class="btn" style="background:transparent; padding:0; width:40px; height:40px;" onclick="paintorSave()">
+                <i data-lucide="download"></i>
+            </button>
+        </div>
+        <div class="paintor-toolbar">
+            <button class="paintor-tool active" onclick="paintorSetTool('brush', this)" title="Brush"><i data-lucide="pen-tool"></i></button>
+            <button class="paintor-tool" onclick="paintorSetTool('eraser', this)" title="Eraser"><i data-lucide="eraser"></i></button>
+            <button class="paintor-tool" onclick="paintorSetTool('line', this)" title="Line"><i data-lucide="minus"></i></button>
+            <button class="paintor-tool" onclick="paintorSetTool('rect', this)" title="Rectangle"><i data-lucide="square"></i></button>
+            <div style="width: 1px; background: var(--md-sys-color-surface-variant); margin: 0 5px;"></div>
+            <button class="paintor-tool" onclick="paintorUndo()" title="Undo"><i data-lucide="undo"></i></button>
+            <button class="paintor-tool" onclick="paintorFilter('invert')" title="Invert Colors"><i data-lucide="contrast"></i></button>
+            
+            <div class="paintor-colors">
+                <div class="paintor-color-btn active" style="background: #000;" onclick="paintorSetColor('#000', this)"></div>
+                <div class="paintor-color-btn" style="background: #e74c3c;" onclick="paintorSetColor('#e74c3c', this)"></div>
+                <div class="paintor-color-btn" style="background: #3498db;" onclick="paintorSetColor('#3498db', this)"></div>
+                <div class="paintor-color-btn" style="background: #2ecc71;" onclick="paintorSetColor('#2ecc71', this)"></div>
+                <div class="paintor-color-btn" style="background: #f1c40f;" onclick="paintorSetColor('#f1c40f', this)"></div>
+                <div class="paintor-color-btn" style="background: #9b59b6;" onclick="paintorSetColor('#9b59b6', this)"></div>
+                <div class="paintor-color-btn" style="background: #ffffff;" onclick="paintorSetColor('#ffffff', this)"></div>
+            </div>
+            
+            <input type="range" id="paintorSize" min="1" max="50" value="5" style="margin-left: 10px;">
+        </div>
+        <div class="paintor-canvas-wrapper" id="paintorWrapper">
+            <canvas id="paintorCanvas" width="800" height="800"></canvas>
+        </div>
+    </div>
+
+    <div class="toast" id="sysToast">Notification</div>
+
+    <!-- FIREBASE INTEGRATION (v10 Modular SDK) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBCdviXOG1Wi3tMO0wl6JN2agjrKmM9p5g",
+            authDomain: "zinkapp-fac18.firebaseapp.com",
+            databaseURL: "https://zinkapp-fac18-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "zinkapp-fac18",
+            storageBucket: "zinkapp-fac18.firebasestorage.app",
+            messagingSenderId: "969322381802",
+            appId: "1:969322381802:web:0ee18e97f0511e615e7293",
+            measurementId: "G-55L7N48SSK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Make auth functions globally available for inline onclicks
+        window.signInWithGoogle = () => {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).catch(err => window.showToast("Login Failed: " + err.message));
+        };
+        
+        window.signInWithGithub = () => {
+            const provider = new GithubAuthProvider();
+            signInWithPopup(auth, provider).catch(err => window.showToast("Login Failed: " + err.message));
+        };
+
+        window.signOutUser = () => {
+            signOut(auth);
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            const authSection = document.getElementById('authSection');
+            if (user) {
+                authSection.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px; justify-content:center; margin-bottom:1rem;">
+                        <img src="${user.photoURL || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%;">
+                        <div style="text-align:left;">
+                            <strong style="display:block;">${user.displayName || 'User'}</strong>
+                            <span style="font-size:0.8rem; opacity:0.7;">${user.email}</span>
+                        </div>
+                    </div>
+                    <button class="btn" style="width:100%;" onclick="signOutUser()">Sign Out</button>
+                `;
+                window.showToast("Welcome back brother.");
+                
+                // Sync notes to Firebase RTDB
+                const notesRef = ref(db, 'users/' + user.uid + '/notes');
+                onValue(notesRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if(data && !document.getElementById('notesArea').value) {
+                        document.getElementById('notesArea').value = data;
+                    }
+                });
+
+                window.firebaseUser = user;
+            } else {
+                authSection.innerHTML = `
+                    <p>Not signed in</p>
+                    <div class="auth-buttons">
+                        <button class="btn btn-primary" onclick="signInWithGoogle()"><i data-lucide="mail" style="display:inline-block; vertical-align:middle; width:18px; margin-right:8px;"></i> Sign in with Google</button>
+                        <button class="btn" onclick="signInWithGithub()"><i data-lucide="github" style="display:inline-block; vertical-align:middle; width:18px; margin-right:8px;"></i> Sign in with GitHub</button>
+                    </div>
+                `;
+                lucide.createIcons();
+                window.firebaseUser = null;
+            }
+        });
+
+        // Expose DB saving for notes
+        window.saveToFirebase = (text) => {
+            if(window.firebaseUser) {
+                set(ref(db, 'users/' + window.firebaseUser.uid + '/notes'), text);
+            }
+        };
+    </script>
+
+    <!-- MAIN LOGIC -->
+    <script>
+        // --- DATA ---
+        const MAIN_SERVICES = [
+            { id: "m1", name: "GPUMate", type: "pc", icon: "cpu" },
+            { id: "m2", name: "CreativeAi", url: "https://creativeaifeo.base44.app/", icon: "sparkles" },
+            { id: "m3", name: "CrevixCore", type: "wip", icon: "box" },
+            { id: "m4", name: "Ozmo", type: "pc", icon: "monitor" },
+            { id: "m5", name: "Strato", type: "pc", icon: "cloud" },
+            { id: "m6", name: "Uzi Engine", url: "https://feoservices.ct.ws/uzi-engine/", icon: "zap" },
+            { id: "m7", name: "Kohler", type: "wip", icon: "hammer" },
+            { id: "m8", name: "BlackPoint", url: "https://blackpoint.base44.app/", icon: "crosshair" }
+        ];
+
+        const OTHER_SERVICES = [
+            { id: "o1", name: "Paintor", type: "internal", icon: "palette" },
+            { id: "o2", name: "TASKIOR", type: "internal", icon: "check-square" },
+            { id: "o3", name: "Dalso", url: "https://feoservices.ct.ws/dalso/", icon: "layers" },
+            { id: "o4", name: "Universio", url: "https://feoservices.ct.ws/universio", icon: "globe" },
+            { id: "o5", name: "CreativeChat", url: "https://creativechat.base44.app", icon: "message-circle" },
+            { id: "o6", name: "Finite", url: "https://finite.base44.app/", icon: "infinity" },
+            { id: "o7", name: "Kohler Botre", type: "wip", icon: "bot" },
+            { id: "o8", name: "Kohler Secris", type: "wip", icon: "shield" },
+            { id: "o9", name: "KASAS", type: "wip", icon: "server" },
+            { id: "o10", name: "Uzi Engine 1.0", url: "https://feoservices.ct.ws/uzi-engine-1-0/", icon: "zap" },
+            { id: "o11", name: "Uzi Engine 2.0", url: "https://feoservices.ct.ws/uzi-engine-2-0/", icon: "zap" },
+            { id: "o12", name: "Uzi Engine 3.0", url: "https://feoservices.ct.ws/uzi-engine-3-0/", icon: "zap" },
+            { id: "o13", name: "Uzi Engine Bundle", type: "bundle", icon: "package" },
+            { id: "o14", name: "Mac26 Simulator", type: "wip", icon: "command" },
+            { id: "o15", name: "BlueOcean Grid", type: "wip", icon: "grid" },
+            { id: "o16", name: "FEO News", type: "internal", icon: "newspaper" }
+        ];
+
+        const ALL_SERVICES = [...MAIN_SERVICES, ...OTHER_SERVICES];
+        let favorites = JSON.parse(localStorage.getItem('feo_favs') || '[]');
+        let currentModalService = null;
+
+        // --- TRANSLATIONS ---
+        const DICT = {
+            en: { home: "Home", main_services: "Main Services", search: "Search", other: "Other Services", settings: "Settings", auth: "Account", appearance: "Appearance", news: "FEO News", website: "Website" },
+            ar: { home: "الرئيسية", main_services: "الخدمات الأساسية", search: "بحث", other: "خدمات أخرى", settings: "الإعدادات", auth: "الحساب", appearance: "المظهر", news: "أخبار FEO", website: "الموقع" },
+            es: { home: "Inicio", main_services: "Servicios Principales", search: "Buscar", other: "Otros Servicios", settings: "Ajustes", auth: "Cuenta", appearance: "Apariencia", news: "Noticias FEO", website: "Sitio Web" },
+            jp: { home: "ホーム", main_services: "主なサービス", search: "検索", other: "その他のサービス", settings: "設定", auth: "アカウント", appearance: "外観", news: "FEO ニュース", website: "ウェブサイト" }
+        };
+
+        // --- CORE UI LOGIC ---
+        function init() {
+            lucide.createIcons();
+            renderList('mainServicesList', MAIN_SERVICES);
+            renderList('otherServicesList', OTHER_SERVICES);
+            renderFavs();
+            taskiorRender();
+            paintorInit();
+            
+            // Load saved settings
+            const savedTheme = localStorage.getItem('feo_theme') || 'light';
+            const savedUzi = localStorage.getItem('feo_uzi') || '3.4';
+            const savedLang = localStorage.getItem('feo_lang') || 'en';
+            const savedNotes = localStorage.getItem('feo_notes') || '';
+            
+            document.getElementById('notesArea').value = savedNotes;
+            
+            // Update custom dropdowns visually
+            syncDropdownVisual('dd-theme', savedTheme);
+            syncDropdownVisual('dd-uzi', savedUzi);
+            syncDropdownVisual('dd-lang', savedLang);
+            
+            changeTheme(savedTheme, false);
+            changeUzi(savedUzi, false);
+            changeLang(savedLang, false);
+
+            // Handle clicking outside custom dropdowns
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.feo-select')) {
+                    document.querySelectorAll('.feo-select').forEach(el => el.classList.remove('open'));
+                }
+            });
+        }
+
+        // --- CUSTOM DROPDOWN LOGIC ---
+        window.toggleDropdown = (id) => {
+            const el = document.getElementById(id);
+            const isOpen = el.classList.contains('open');
+            document.querySelectorAll('.feo-select').forEach(d => d.classList.remove('open'));
+            if (!isOpen) el.classList.add('open');
+        }
+
+        window.selectDropdownOption = (dropdownId, value, text) => {
+            const el = document.getElementById(dropdownId);
+            el.querySelector('.selected-text').textContent = text;
+            el.classList.remove('open');
+            
+            if(dropdownId === 'dd-theme') changeTheme(value, true);
+            if(dropdownId === 'dd-uzi') changeUzi(value, true);
+            if(dropdownId === 'dd-lang') changeLang(value, true);
+        }
+
+        function syncDropdownVisual(dropdownId, value) {
+            const el = document.getElementById(dropdownId);
+            const options = el.querySelectorAll('.feo-option');
+            options.forEach(opt => {
+                if (opt.getAttribute('onclick').includes(`'${value}'`)) {
+                    el.querySelector('.selected-text').textContent = opt.textContent;
+                }
+            });
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const targetNav = document.querySelector(`.nav-item[data-target="${tabId}"]`);
+            if(targetNav) targetNav.classList.add('active');
+            
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${tabId}`).classList.add('active');
+
+            const titleEl = document.getElementById('pageTitle');
+            if(tabId === 'main') titleEl.setAttribute('data-lang', 'main_services');
+            else if(tabId === 'news') titleEl.setAttribute('data-lang', 'news');
+            else titleEl.setAttribute('data-lang', tabId);
+            
+            applyTranslation(localStorage.getItem('feo_lang') || 'en');
+        }
+
+        function renderList(containerId, data) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            data.forEach(srv => {
+                const item = document.createElement('div');
+                item.className = 'service-item';
+                item.onclick = () => handleServiceClick(srv);
+                item.innerHTML = `
+                    <div class="service-icon"><i data-lucide="${srv.icon}"></i></div>
+                    <div style="flex:1;">
+                        <h3 style="margin-bottom: 2px;">${srv.name}</h3>
+                        <p style="font-size: 0.75rem; opacity: 0.7;">${getBadgeText(srv)}</p>
+                    </div>
+                    <i data-lucide="chevron-right" style="color: var(--md-sys-color-on-surface-variant); opacity:0.5;"></i>
+                `;
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function getBadgeText(srv) {
+            if(srv.type === 'pc') return '💻 PC Only';
+            if(srv.type === 'wip') return '🚧 Under Production';
+            if(srv.type === 'bundle') return '📦 Bundle';
+            if(srv.type === 'internal') return '🔥 Built-in App';
+            return '🌐 Web App';
+        }
+
+        function handleServiceClick(srv) {
+            if(srv.type === 'pc') { showToast(`${srv.name} is available on PC only.`); return; }
+            if(srv.type === 'wip') { showToast(`${srv.name} is currently under production.`); return; }
+            if(srv.type === 'bundle') { switchTab('main'); return; }
+            
+            if(srv.name === 'FEO News') { switchTab('news'); return; }
+            if(srv.name === 'TASKIOR') { document.getElementById('taskiorModal').classList.add('open'); return; }
+            if(srv.name === 'Paintor') { document.getElementById('paintorModal').classList.add('open'); paintorResize(); return; }
+
+            openService(srv.name, srv.url, srv.icon, srv.id);
+        }
+
+        function openService(name, url, icon, id=null) {
+            currentModalService = { name, url, icon, id };
+            document.getElementById('modalTitle').textContent = name;
+            const modalBody = document.getElementById('modalBody');
+            
+            if (url) {
+                modalBody.innerHTML = `
+                    <div class="iframe-fallback">
+                        <i data-lucide="shield-alert" style="width: 48px; height: 48px; color: var(--md-sys-color-on-surface-variant); opacity: 0.5;"></i>
+                        <h3 style="color: var(--md-sys-color-on-background);">Display Protected</h3>
+                        <p style="color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem;">If the application does not load, the provider has restricted embedding. Please open it directly.</p>
+                        <button class="btn btn-primary" onclick="openExternal()">Open in Web Browser</button>
+                    </div>
+                    <iframe src="${url}" allow="microphone; camera; clipboard-write"></iframe>
+                `;
+            } else {
+                modalBody.innerHTML = `<div class="modal-error"><h2>404</h2><p>No URL mapped for this service.</p></div>`;
+            }
+
+            const favIcon = document.getElementById('modalFavIcon');
+            if(id && favorites.includes(id)) {
+                favIcon.setAttribute('fill', 'currentColor');
+                favIcon.style.color = '#eab308';
+            } else {
+                favIcon.setAttribute('fill', 'none');
+                favIcon.style.color = 'inherit';
+            }
+
+            document.getElementById('appModal').classList.add('open');
+            lucide.createIcons();
+        }
+
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('open');
+            if(id === 'appModal') {
+                document.getElementById('modalBody').innerHTML = ''; 
+                currentModalService = null;
+            }
+        }
+
+        function openExternal() {
+            if(currentModalService && currentModalService.url) {
+                window.open(currentModalService.url, '_blank');
+            }
+        }
+
+        function toggleFavFromModal() {
+            if(!currentModalService || !currentModalService.id) {
+                showToast("Cannot favorite external non-mapped links."); return;
+            }
+            const id = currentModalService.id;
+            if(favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+                showToast("Removed from favorites");
+            } else {
+                favorites.push(id);
+                showToast("Added to favorites");
+            }
+            localStorage.setItem('feo_favs', JSON.stringify(favorites));
+            
+            const favIcon = document.getElementById('modalFavIcon');
+            if(favorites.includes(id)) {
+                favIcon.setAttribute('fill', 'currentColor'); favIcon.style.color = '#eab308';
+            } else {
+                favIcon.setAttribute('fill', 'none'); favIcon.style.color = 'inherit';
+            }
+            renderFavs();
+        }
+
+        function renderFavs() {
+            const container = document.getElementById('favList');
+            container.innerHTML = '';
+            const favItems = ALL_SERVICES.filter(s => favorites.includes(s.id));
+            if(favItems.length === 0) {
+                container.innerHTML = `<p style="padding: 1rem; opacity:0.6;">No favorites yet. Open an app and click the star.</p>`; return;
+            }
+            favItems.forEach(srv => {
+                const item = document.createElement('div');
+                item.className = 'service-item';
+                item.onclick = () => handleServiceClick(srv);
+                item.innerHTML = `
+                    <div class="service-icon"><i data-lucide="${srv.icon}"></i></div>
+                    <div style="flex:1;"><h3>${srv.name}</h3></div>
+                    <button class="btn" style="background:transparent; padding:0; width:30px;" onclick="event.stopPropagation(); removeFav('${srv.id}')">
+                        <i data-lucide="x"></i>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        window.removeFav = (id) => {
+            favorites = favorites.filter(f => f !== id);
+            localStorage.setItem('feo_favs', JSON.stringify(favorites));
+            renderFavs();
+        }
+
+        // --- SEARCH ---
+        window.handleSearch = () => {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const container = document.getElementById('searchResults');
+            
+            if (q === 'bismillah') {
+                showToast("In the name of Allah. Welcome brother. 🕌");
+                document.getElementById('searchInput').value = '';
+                container.innerHTML = ''; return;
+            }
+
+            if(!q) { container.innerHTML = ''; return; }
+
+            const results = ALL_SERVICES.filter(s => s.name.toLowerCase().includes(q));
+            container.innerHTML = '';
+            
+            if(results.length === 0) {
+                container.innerHTML = `<p style="padding:1rem;text-align:center;">No services found.</p>`; return;
+            }
+
+            results.forEach(srv => {
+                const item = document.createElement('div');
+                item.className = 'service-item';
+                item.onclick = () => handleServiceClick(srv);
+                item.innerHTML = `
+                    <div class="service-icon"><i data-lucide="${srv.icon}"></i></div>
+                    <div style="flex:1;"><h3>${srv.name}</h3><p style="font-size:0.75rem;">${getBadgeText(srv)}</p></div>
+                `;
+                container.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        // --- SETTINGS LOGIC ---
+        window.changeTheme = (val, notify = true) => {
+            document.documentElement.setAttribute('data-theme', val);
+            document.body.setAttribute('data-theme', val);
+            localStorage.setItem('feo_theme', val);
+            if(notify) showToast(`Theme changed`);
+        }
+
+        window.changeUzi = (val, notify = true) => {
+            document.documentElement.setAttribute('data-uzi', val);
+            document.body.setAttribute('data-uzi', val);
+            localStorage.setItem('feo_uzi', val);
+            if(notify) showToast(`Uzi Engine UI ${val} Applied`);
+        }
+
+        window.changeLang = (val, notify = true) => {
+            localStorage.setItem('feo_lang', val);
+            applyTranslation(val);
+            if(notify) showToast(`Language Updated`);
+        }
+
+        function applyTranslation(lang) {
+            const d = DICT[lang] || DICT.en;
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if(d[key]) el.textContent = d[key];
+            });
+        }
+
+        window.saveNotes = () => {
+            const txt = document.getElementById('notesArea').value;
+            localStorage.setItem('feo_notes', txt);
+            if(window.saveToFirebase) window.saveToFirebase(txt);
+        }
+
+        window.generateQR = () => {
+            const txt = document.getElementById('notesArea').value;
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            if(!txt) { showToast("Please write some notes first to generate a QR."); return; }
+            new QRCode(qrContainer, { text: txt, width: 128, height: 128, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+        }
+
+        // --- TASKIOR LOGIC ---
+        let tasks = JSON.parse(localStorage.getItem('feo_tasks') || '[]');
+        
+        function taskiorRender() {
+            const list = document.getElementById('taskiorList');
+            list.innerHTML = '';
+            tasks.forEach((t, i) => {
+                const li = document.createElement('li');
+                li.className = `task-item ${t.done ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div style="flex:1; cursor:pointer;" onclick="taskiorToggle(${i})">${t.text}</div>
+                    <button class="btn" style="background:transparent; padding:0; width:30px; color:var(--md-sys-color-error);" onclick="taskiorDelete(${i})">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                `;
+                list.appendChild(li);
+            });
+            lucide.createIcons();
+        }
+
+        window.taskiorAddTask = () => {
+            const inp = document.getElementById('newTaskInput');
+            if(!inp.value.trim()) return;
+            tasks.push({text: inp.value.trim(), done: false});
+            inp.value = '';
+            taskiorSaveData();
+        }
+
+        window.taskiorToggle = (i) => {
+            tasks[i].done = !tasks[i].done;
+            taskiorSaveData();
+        }
+
+        window.taskiorDelete = (i) => {
+            tasks.splice(i, 1);
+            taskiorSaveData();
+        }
+
+        function taskiorSaveData() {
+            localStorage.setItem('feo_tasks', JSON.stringify(tasks));
+            taskiorRender();
+        }
+
+        // --- PAINTOR PRO LOGIC ---
+        const paintor = {
+            canvas: null, ctx: null, isDrawing: false, tool: 'brush', color: '#000', size: 5,
+            history: [], lastX: 0, lastY: 0, startX: 0, startY: 0, tempImg: null
+        };
+
+        function paintorInit() {
+            paintor.canvas = document.getElementById('paintorCanvas');
+            paintor.ctx = paintor.canvas.getContext('2d', { willReadFrequently: true });
+            
+            // Events for drawing (with thumb rejection heuristics)
+            paintor.canvas.addEventListener('pointerdown', paintorStart);
+            paintor.canvas.addEventListener('pointermove', paintorDraw);
+            paintor.canvas.addEventListener('pointerup', paintorStop);
+            paintor.canvas.addEventListener('pointercancel', paintorStop);
+
+            document.getElementById('paintorSize').addEventListener('input', (e) => paintor.size = e.target.value);
+            
+            // Initial white background
+            paintor.ctx.fillStyle = '#ffffff';
+            paintor.ctx.fillRect(0, 0, paintor.canvas.width, paintor.canvas.height);
+            paintorSaveHistory();
+        }
+
+        window.paintorResize = () => {
+            // Recalculate CSS scale but keep logical 800x800 for high res drawing
+            const wrapper = document.getElementById('paintorWrapper');
+            const scale = Math.min(wrapper.clientWidth / 800, wrapper.clientHeight / 800) * 0.95;
+            paintor.canvas.style.transform = `scale(${scale})`;
+        }
+
+        function paintorStart(e) {
+            // Thumb Rejection: Only allow pen, mouse, or single thin touch
+            if(e.pointerType === 'touch' && e.width > 20) return; // Prevent fat thumbs
+            if(!e.isPrimary) return;
+
+            paintor.isDrawing = true;
+            const pos = getMousePos(e);
+            paintor.lastX = pos.x; paintor.lastY = pos.y;
+            paintor.startX = pos.x; paintor.startY = pos.y;
+            
+            if(paintor.tool === 'line' || paintor.tool === 'rect') {
+                paintor.tempImg = paintor.ctx.getImageData(0,0,paintor.canvas.width,paintor.canvas.height);
+            } else {
+                paintor.ctx.beginPath();
+                paintor.ctx.moveTo(paintor.lastX, paintor.lastY);
+            }
+        }
+
+        function paintorDraw(e) {
+            if (!paintor.isDrawing) return;
+            if(e.pointerType === 'touch' && e.width > 20) return;
+            e.preventDefault(); // Stop scrolling
+
+            const pos = getMousePos(e);
+            paintor.ctx.lineWidth = paintor.size;
+            paintor.ctx.lineCap = 'round';
+            paintor.ctx.lineJoin = 'round';
+            paintor.ctx.strokeStyle = paintor.tool === 'eraser' ? '#ffffff' : paintor.color;
+
+            if (paintor.tool === 'brush' || paintor.tool === 'eraser') {
+                paintor.ctx.lineTo(pos.x, pos.y);
+                paintor.ctx.stroke();
+            } else if (paintor.tool === 'line') {
+                paintor.ctx.putImageData(paintor.tempImg, 0, 0);
+                paintor.ctx.beginPath();
+                paintor.ctx.moveTo(paintor.startX, paintor.startY);
+                paintor.ctx.lineTo(pos.x, pos.y);
+                paintor.ctx.stroke();
+            } else if (paintor.tool === 'rect') {
+                paintor.ctx.putImageData(paintor.tempImg, 0, 0);
+                paintor.ctx.beginPath();
+                paintor.ctx.rect(paintor.startX, paintor.startY, pos.x - paintor.startX, pos.y - paintor.startY);
+                paintor.ctx.stroke();
+            }
+
+            paintor.lastX = pos.x;
+            paintor.lastY = pos.y;
+        }
+
+        function paintorStop(e) {
+            if (!paintor.isDrawing) return;
+            paintor.isDrawing = false;
+            paintorSaveHistory();
+        }
+
+        function getMousePos(e) {
+            const rect = paintor.canvas.getBoundingClientRect();
+            // Adjust for CSS scaling
+            const scaleX = paintor.canvas.width / rect.width;
+            const scaleY = paintor.canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        window.paintorSetTool = (t, el) => {
+            paintor.tool = t;
+            document.querySelectorAll('.paintor-tool').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        window.paintorSetColor = (c, el) => {
+            paintor.color = c;
+            if(paintor.tool === 'eraser') paintorSetTool('brush', document.querySelector('.paintor-tool[title="Brush"]'));
+            document.querySelectorAll('.paintor-color-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function paintorSaveHistory() {
+            if(paintor.history.length > 20) paintor.history.shift(); // Max 20 undo steps
+            paintor.history.push(paintor.ctx.getImageData(0,0,paintor.canvas.width,paintor.canvas.height));
+        }
+
+        window.paintorUndo = () => {
+            if(paintor.history.length > 1) {
+                paintor.history.pop(); // remove current
+                const last = paintor.history[paintor.history.length - 1];
+                paintor.ctx.putImageData(last, 0, 0);
+            }
+        }
+
+        window.paintorClear = () => {
+            paintor.ctx.fillStyle = '#ffffff';
+            paintor.ctx.fillRect(0, 0, paintor.canvas.width, paintor.canvas.height);
+            paintorSaveHistory();
+        }
+
+        window.paintorSave = () => {
+            const link = document.createElement('a');
+            link.download = 'Paintor_FEO.png';
+            link.href = paintor.canvas.toDataURL();
+            link.click();
+        }
+
+        window.paintorFilter = (type) => {
+            const imgData = paintor.ctx.getImageData(0, 0, paintor.canvas.width, paintor.canvas.height);
+            const data = imgData.data;
+            if(type === 'invert') {
+                for(let i = 0; i < data.length; i += 4) {
+                    data[i] = 255 - data[i];     // red
+                    data[i+1] = 255 - data[i+1]; // green
+                    data[i+2] = 255 - data[i+2]; // blue
+                }
+            }
+            paintor.ctx.putImageData(imgData, 0, 0);
+            paintorSaveHistory();
+        }
+
+        // --- UTILS ---
+        window.showToast = (msg) => {
+            const t = document.getElementById('sysToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('resize', () => {
+            if(document.getElementById('paintorModal').classList.contains('open')) paintorResize();
+        });
+
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.error("Service Worker Registration Failed!", err));
+      }
+    </script>
+</body>
+</html>
